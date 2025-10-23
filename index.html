@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            display: flex;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            font-size: 22px;
+            background-color: #d3d3d3; /* 整個網頁背景為淺灰色 */
+        }
+
+        h1 {
+            margin-top: 0px; /* 調整標題與上方的距離 */
+            font-size: 40px; /* 調整標題字體大小 */
+            color: #000000;
+            background-color: #d3d3d3; /* 調整標題背景色為淺灰色 */
+            padding: 0px; /* 添加標題的內邊距 */
+            text-align: center; /* 標題置中 */
+        }
+
+        nav {
+            background-color: #333;
+            color: white;
+            padding: 15px;
+            width: 240px;
+            height: 100vh; /* Set a fixed height using viewport height (100vh) */
+        }
+
+        nav button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 20px;
+            color: white;
+            background-color: #555;
+            border: none;
+            cursor: pointer;
+        }
+
+        nav button:hover {
+            background-color: #333;
+        }
+
+        main {
+            flex: 1;
+            padding: 20px;
+        }
+
+        form {
+            text-align: left; /* 輸入框和下拉式選單靠左對齊 */
+            margin-top: 10px; /* 調整表單元素之間的間距 */
+            padding: 0 0px; /* 調整表單的內邊距 */
+        }
+
+        label {
+            font-size: 20px; /* 设置label元素的字体大小为20像素 */
+            display: flex; /* 将label元素设为flex布局 */
+            align-items: center; /* 垂直居中对齐 */
+        }
+
+        input, select {
+            font-size: 20px; /* 设置输入框和下拉式選單的字体大小为20像素 */
+            padding: 8px; /* 设置输入框和下拉式選單的内边距 */
+            margin-left: 0; /* 調整左邊距為0 */
+            width: 240px; /* 調整輸入框和下拉式選單的寬度 */
+        }
+
+        button {
+            width: 200px;
+            height: 80px;
+            font-size: 22px;
+            background-color: #808080;
+            color: white;
+            border: none;
+            transition: background-color 0.3s;
+            margin-left: 0; /* 調整左邊距為0 */
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+    </style>
+
+    <script src="./patient.js"></script>
+    <script src="./observation.js"></script>
+    <script src="./download.js"></script>
+    <title>病患資料</title>
+</head>
+<body>
+    
+    <nav>
+        <button onclick="window.location.href = 'showPatientInfo.html'">病患資料建檔</button>
+        <button onclick="window.location.href = 'diagnosis_info.html'">上傳病歷檔案</button>
+        <button onclick="window.location.href = 'showDownload.html'">下載病歷報告</button>
+	<!--<button onclick="window.location.href = 'medicine.html'">藥物相關注意事項警示</button>-->
+	    <button onclick="window.location.href = 'MedicineRecommandation.html'">藥物推薦</button>
+	    <!--<button onclick="window.location.href = 'Nutritional management.html'">營養管理</button>-->
+	<button onclick="window.location.href = 'showAllPatients.html'">查看病患資料</button>
+    </nav>
+
+    <main id="content">
+        <!-- 內容將根據點擊的按鈕而變化 -->
+        <h1>電子病歷資訊網站</h1>
+    </main>
+
+    <script>
+        function showPatientInfo() {
+    document.getElementById("content").innerHTML = `
+        <h1 style="text-align: center;">電子病歷資訊網站</h1>
+        <h2>上傳病患資料</h2>
+        <p id="errorOutput" style="color: red;"></p>
+        <form action="">
+            <label for="name">姓名</label>
+            <input type="text" id="name" placeholder="">
+            <br><br>
+            <label for="userID">身分證字號</label>
+            <input type="text" id="userID" placeholder="">
+            <br><br>
+            <label for="birthdate">生日</label>
+            <input type="date" id="birthdate" pattern="\d{4}-\d{2}-\d{2}" title="Please enter date in format yyyy-mm-dd"> 
+            <br><br>
+            <label for="gender">性別</label>
+		<select id="gender">
+		    <option value="male">male</option>
+		    <option value="female">female</option>
+		    <option value="unknown">unknown</option>
+		    <option value="others">others</option>
+		</select>
+            <br><br>
+            <button type="button"onclick="uploadFhirData()">送出</button>
+			<br><br>
+					<div id="loadingSpinner" style="display: none; text-align: center;">
+                    <img src="Loading_icon.gif" alt="Loading..." width="50" height="50">
+                    <p>Loading...</p>
+                </div>
+                    <div id="responseMessage"></div>
+        </form>`;
+	}
+
+		function showDiagnosisInfo() {
+            document.getElementById("content").innerHTML = `
+                <h1 style="text-align: center;">電子病歷資訊網站</h1>
+				<h2>上傳病歷檔案</h2>
+				<p id="errorOutput" style="color: red;"></p>
+                <form action="#" method="post" enctype="multipart/form-data">
+                    <label for="">姓名</label>
+                    <input type="text" id="name">
+                    <br><br>
+                    <label for="userID">身分證字號</label>
+                    <input type="text" id="userID">
+                    <br><br>
+					<label for="email">Email(用於上傳結果通知)</label> <!-- 新增的Email欄位 -->
+					<input type="email" id="email"> <!-- 新增的Email欄位 -->
+					<br><br>
+                    <label for="fileInput">選擇檔案：</label>
+                    <input type="file" id="fileInput" name="fileInput" accept=".txt, .pdf, .doc, .docx">
+                    <br><br>
+                    <button type="button" onclick="uploadFile()">上傳</button>
+                    <br><br>
+					<div id="loadingSpinner" style="display: none; text-align: center;">
+                    <img src="Loading_icon.gif" alt="Loading..." width="50" height="50">
+                    <p>Loading...</p>
+                </div>
+                    <div id="responseMessage"></div>
+                </form>`;
+        }
+      
+
+        function showDownload() {
+            document.getElementById("content").innerHTML = `
+                <h1 style="text-align: center;">電子病歷資訊網站</h1>
+				<h2>下載病患病歷</h2>
+                <p id="errorOutput" style="color: red;"></p>
+                <form action="#" method="post" enctype="multipart/form-data">
+                    <label for="">姓名</label>
+                    <input type="text" id="name">
+                    <br><br>
+                    <label for="userID">身分證字號</label>
+                    <input type="text" id="userID">
+                    <br><br>
+                    <button type="button" onclick="downloadData()">下載資料</button>
+					<br><br>
+					<div id="loadingSpinner" style="display: none; text-align: center;">
+					<img src="Loading_icon.gif" alt="Loading..." width="50" height="50">
+					<p>Loading...</p>
+				</div>
+					<div id="responseMessage"></div>
+                </form>`;
+        }
+		/*function showAllPatients() {
+			
+			fetch('http://140.116.156.231:8080/fhir/Patient', {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			})
+			.then(response => response.json())
+			.then(data => {
+				let html = '<h1 style="text-align: center;">電子病歷資訊網站</h1>';
+				html += '<table border="1">';
+				html += '<tr><th>ID</th><th>姓名</th><th>性別</th><th>生日</th></tr>';
+				data.entry.forEach(entry => {
+					const id = entry.resource.id;
+					let name = entry.resource.name && entry.resource.name[0] && entry.resource.name[0].text ? entry.resource.name[0].text : '';
+					const gender = entry.resource.gender;
+					const birthdate = entry.resource.birthDate;
+					html += `<tr><td>${id}</td><td>${name}</td><td>${gender}</td><td>${birthdate}</td></tr>`;
+				});
+				html += '</table>';
+				document.getElementById("content").innerHTML = html;
+			})
+			.catch(error => console.error('Error fetching data:', error));
+		}*/
+		 function uploadPatientInfo(url) {
+			const data = new FormData();
+			data.append('userURL', '/Patient'); // 將字符串 'Patient' 添加到 FormData 中，以鍵名 'userURL'
+
+			fetch(url, {
+				method: 'POST',
+				body: data
+			})
+			.then(response => {
+				if (!response.ok) {
+					throw new Error('Network response was not ok');
+				}
+				return response.json(); // 返回 JSON 格式的數據
+			})
+			.then(data => {
+				let html = '<h1 style="text-align: center;">電子病歷資訊網站</h1>';
+				html += '<table border="1">';
+				html += '<tr><th>姓名</th><th>身分證字號</th><th>性別</th><th>生日</th><th>檢測數據</th><th>診斷報告</th><th>主訴</th><th>過去病史</th><th>家族病史</th></tr>';
+				
+				data.entry.forEach(entry => {
+					// 排除 ID 为 147 的条目
+					if (entry.resource.id !== '147') {
+						const id = entry.resource.id;
+						let name = entry.resource.name && entry.resource.name[0] && entry.resource.name[0].text ? entry.resource.name[0].text : '';
+						const gender = entry.resource.gender;
+						const birthdate = entry.resource.birthDate;
+
+						// 查找身份证标识符的值
+						let identifierValue = '';
+						if (entry.resource.identifier && Array.isArray(entry.resource.identifier)) {
+							// 遍历所有标识符
+							entry.resource.identifier.forEach(identifier => {
+								if (identifier.value) {
+									identifierValue = identifier.value;
+								}
+							});
+						}
+
+						html += `<tr><td>${name}</td><td>${identifierValue}</td><td>${gender}</td><td>${birthdate}</td><td><button onclick="showObservations('${id}')">檢測數據</button></td><td><button onclick="DiagnosticReport('${id}')">查看診斷報告</button></td><td><button onclick="chiefcomplaint('${id}')">查看主訴</button></td><td><button onclick="PastHistory('${id}')">查看過去病史</button></td><td><button onclick="Familyhistory('${id}')">查看家族病史</button></td></tr>`;
+					}
+				}); 
+				
+				html += '</table>';
+				document.getElementById("content").innerHTML = html;
+			})
+			.catch(error => {
+				console.error('Error uploading data:', error); 
+			});
+		}
+
+		function showAllPatients() {
+			const url = 'https://02f9-140-116-156-231.ngrok-free.app/view'; // Flask 伺服器 URL
+			uploadPatientInfo(url);
+		}
+
+		function showObservations(patientId) {
+		// 構建包含病患 ID 的 FormData
+		const data = new FormData();
+		data.append('userURL', `/Observation?patient=${patientId}`);
+
+		const url = 'https://02f9-140-116-156-231.ngrok-free.app/view'; // Flask 伺服器的端點 URL
+
+		fetch(url, {
+			method: 'POST',
+			body: data
+		})
+		.then(response => {
+			if (!response.ok) {
+				throw new Error('Network response was not ok');
+			}
+			return response.text();
+		})
+		.then(data => {
+			const jsonData = JSON.parse(data); // 解析JSON数据
+
+			let html = '<h1 style="text-align: center;">檢測數據</h1>';
+			html += '<table border="1">';
+			html += '<tr><th>檢測項目</th><th>數值</th><th>單位</th><th>日期</th></tr>';
+
+			// 检查 entry 属性是否存在并且是一个数组
+			if (jsonData.hasOwnProperty('entry') && Array.isArray(jsonData.entry)) {
+				jsonData.entry.forEach(entry => {
+					const id = entry.resource.id;
+					const codeText = entry.resource.code.text;
+					let value = '';
+					let unit = '';
+					let effectiveDateTime = ''; // 添加 effectiveDateTime 变量
+
+					if (entry.resource.hasOwnProperty('valueQuantity')) {
+						value = entry.resource.valueQuantity.value;
+						unit = entry.resource.valueQuantity.unit;
+					} else if (entry.resource.hasOwnProperty('valueString')) {
+						value = entry.resource.valueString; 
+					}
+
+					if (entry.resource.hasOwnProperty('effectiveDateTime')) {
+						effectiveDateTime = entry.resource.effectiveDateTime;
+					}
+
+					// 将表格行添加到HTML字符串中
+					html += `<tr><td>${codeText}</td><td>${value}</td><td>${unit}</td><td>${effectiveDateTime}</td></tr>`;
+				});
+			} else {
+				console.error('Error: Data structure is invalid.'); // 数据结构无效的错误处理
+			}
+
+			html += '</table>';
+			// 添加距离
+			html += '<br><br>';
+			// 添加上一页按钮
+			html += '<button onclick="showAllPatients()">上一頁</button>';
+			document.getElementById("content").innerHTML = html;
+
+		})
+		.catch(error => {
+			console.error('Error fetching data:', error);
+		});
+	}
+
+
+
+
+		function DiagnosticReport(patientId) {
+			// 构建包含病患 ID 的 FormData
+			const data = new FormData();
+			data.append('userURL', `/DiagnosticReport?patient=${patientId}`);
+
+			const url = 'https://02f9-140-116-156-231.ngrok-free.app/view'; // Flask 服务器的端点 URL
+
+			fetch(url, {
+				method: 'POST',
+				body: data
+			})
+			.then(response => {
+				if (!response.ok) {
+					throw new Error('Network response was not ok');
+				}
+				return response.text();
+			})
+			.then(data => {
+				const jsonData = JSON.parse(data); 
+
+				let html = '<h1 style="text-align: center;">診斷報告</h1>';
+				html += '<table border="1" style="width: 100%; table-layout: fixed;">'; 
+				html += '<colgroup>'; 
+				html += '<col style="width: 21%;">'; 
+				html += '<col style="width: 11%;">'; 
+				html += '<col style="width: 68%;">'; 
+				html += '</colgroup>';
+
+				html += '<tr><th>診斷報告</th><th>日期</th><th>診斷結果</th></tr>';
+
+				if (jsonData.hasOwnProperty('entry') && Array.isArray(jsonData.entry)) {
+					jsonData.entry.forEach(entry => {
+						const id = entry.resource.id;
+						const codeText = entry.resource.code.text;
+						let effectiveDateTime = ''; 
+						let conclusion = ''; 
+
+						if (entry.resource.hasOwnProperty('effectiveDateTime')) {
+							effectiveDateTime = entry.resource.effectiveDateTime;
+						}
+
+						if (entry.resource.hasOwnProperty('conclusion')) {
+							conclusion = entry.resource.conclusion;
+						}
+
+						// 将表格行添加到HTML字符串中
+						html += `<tr><td>${codeText}</td><td>${effectiveDateTime}</td><td>${conclusion}</td></tr>`;
+					});
+				} else {
+					console.error('Error: Data structure is invalid.'); 
+				}
+
+				html += '</table>';
+
+				// 添加距离
+				html += '<br><br>';
+				// 添加上一页按钮
+				html += '<button onclick="showAllPatients()">上一頁</button>';
+				document.getElementById("content").innerHTML = html;
+
+			})
+			.catch(error => {
+				console.error('Error fetching data:', error);
+			});
+
+		}
+
+		
+		
+		
+		
+		function chiefcomplaint(patientId) {
+    const data = new FormData();
+    data.append('userURL', `/Condition?_text=%27主訴%27&patient=${patientId}`);
+
+    const url = 'https://02f9-140-116-156-231.ngrok-free.app/view'; // Flask 服务器的端点 URL
+
+    fetch(url, {
+        method: 'POST',
+        body: data
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.text();
+    })
+    .then(data => {
+        const jsonData = JSON.parse(data); 
+
+        let html = '<h1 style="text-align: center;">主訴</h1>';
+        html += '<table border="1">';
+        html += '<tr><th>主訴內容</th><th>日期</th></tr>';
+
+        if (jsonData.hasOwnProperty('entry') && Array.isArray(jsonData.entry)) {
+            jsonData.entry.forEach(entry => {
+                const id = entry.resource.id;
+                const codeText = entry.resource.code.text;
+                let onsetDateTime = ''; 
+                let conclusion = ''; 
+
+                if (entry.resource.hasOwnProperty('onsetDateTime')) {
+                    onsetDateTime = entry.resource.onsetDateTime;
+                }
+
+                if (entry.resource.hasOwnProperty('conclusion')) {
+                    conclusion = entry.resource.conclusion;
+                }
+
+                // 将表格行添加到HTML字符串中
+                html += `<tr><td>${codeText}</td><td>${onsetDateTime}</td></tr>`;
+            });
+        } else {
+            console.error('Error: Data structure is invalid.'); 
+        }
+
+        html += '</table>';
+
+        // 添加距离
+        html += '<br><br>';
+        // 添加上一页按钮
+        html += '<button onclick="showAllPatients()">上一頁</button>';
+        document.getElementById("content").innerHTML = html;
+
+    })
+    .catch(error => {
+        console.error('Error fetching data:', error);
+    });
+}
+
+function PastHistory(patientId) {
+    const data = new FormData();
+    data.append('userURL', `/Condition?_text=%27%E9%81%8E%E5%8E%BB%E7%97%85%E5%8F%B2%27&patient=${patientId}`);
+
+    const url = 'https://02f9-140-116-156-231.ngrok-free.app/view'; // Flask 服务器的端点 URL
+
+    fetch(url, {
+        method: 'POST',
+        body: data
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.text();
+    })
+    .then(data => {
+        const jsonData = JSON.parse(data); 
+
+        let html = '<h1 style="text-align: center;">過去病史</h1>';
+        html += '<table border="1">';
+        html += '<tr><th>過去病史</th></tr>';
+
+        if (jsonData.hasOwnProperty('entry') && Array.isArray(jsonData.entry)) {
+            jsonData.entry.forEach(entry => {
+                const id = entry.resource.id;
+                const codeText = entry.resource.code.text;
+                let onsetDateTime = ''; 
+                let conclusion = ''; 
+
+                if (entry.resource.hasOwnProperty('onsetDateTime')) {
+                    onsetDateTime = entry.resource.onsetDateTime;
+                }
+
+                if (entry.resource.hasOwnProperty('conclusion')) {
+                    conclusion = entry.resource.conclusion;
+                }
+
+                // 将表格行添加到HTML字符串中
+                html += `<tr><td>${codeText}</td></tr>`;
+            });
+        } else {
+            console.error('Error: Data structure is invalid.'); 
+        }
+
+        html += '</table>';
+
+        // 添加距离
+        html += '<br><br>';
+        // 添加上一页按钮
+        html += '<button onclick="showAllPatients()">上一頁</button>';
+        document.getElementById("content").innerHTML = html;
+
+    })
+    .catch(error => {
+        console.error('Error fetching data:', error);
+    });
+}
+
+function Familyhistory(patientId) {
+    const data = new FormData();
+    data.append('userURL', `/FamilyMemberHistory?patient=${patientId}`);
+
+    const url = 'https://02f9-140-116-156-231.ngrok-free.app/view'; // Flask 服务器的端点 URL
+
+    fetch(url, {
+        method: 'POST',
+        body: data
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.text();
+    })
+    .then(data => {
+        const jsonData = JSON.parse(data); 
+
+        let html = '<h1 style="text-align: center;">家族病史</h1>';
+        html += '<table border="1">';
+        html += '<tr><th>家族病史</th></tr>';
+
+        if (jsonData.hasOwnProperty('entry') && Array.isArray(jsonData.entry)) {
+            jsonData.entry.forEach(entry => {
+                let conditionText = ''; 
+
+                if (entry.resource.hasOwnProperty('condition') && Array.isArray(entry.resource.condition)) {
+                    entry.resource.condition.forEach(condition => {
+                        if (condition.code && condition.code.text) {
+                            conditionText = condition.code.text;
+                        }
+                    });
+                }
+
+                // 将表格行添加到HTML字符串中
+                html += `<tr><td>${conditionText}</td></tr>`;
+            });
+        }
+        else {
+            console.error('Error: Data structure is invalid.'); 
+        }
+
+        html += '</table>';
+
+        // 添加距离
+        html += '<br><br>';
+        // 添加上一页按钮
+        html += '<button onclick="showAllPatients()">上一頁</button>';
+        document.getElementById("content").innerHTML = html;
+
+    })
+    .catch(error => {
+        console.error('Error fetching data:', error);
+    });
+}
+
+
+
+
+
+
+
+
+
+
+    </script>
+</body>
+</html>

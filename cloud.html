@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+       body {
+            display: flex;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            font-size: 22px;
+            background-color: #d3d3d3; /* 整個網頁背景為淺灰色 */
+        }
+
+        h1 {
+            margin-top: 0px; /* 調整標題與上方的距離 */
+            font-size: 40px; /* 調整標題字體大小 */
+            color: #000000;
+            background-color: #d3d3d3; /* 調整標題背景色為淺灰色 */
+            padding: 0px; /* 添加標題的內邊距 */
+            text-align: center; /* 標題置中 */
+        }
+
+        nav {
+            background-color: #333;
+            color: white;
+            padding: 15px;
+            width: 240px; /* 固定导航栏的宽度 */
+            height: 100vh; /* 设置导航栏的高度，充满整个视口高度 */
+            position: fixed; /* 固定导航栏在页面左侧 */
+            left: 0; /* 将导航栏固定在页面左侧 */
+            top: 0; /* 将导航栏固定在页面顶部 */
+        }
+
+        nav button {
+            width: 100%; /* 设置按钮宽度为导航栏宽度的百分比 */
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 20px;
+            color: white;
+            background-color: #555;
+            border: none;
+            cursor: pointer;
+        }
+
+        nav button:hover {
+            background-color: #333;
+        }
+
+        main {
+            flex: 1;
+            padding: 20px;
+            margin-left: 260px; /* 留出左側導航欄的寬度 */
+        }
+
+        form {
+            text-align: left; /* 輸入框和下拉式選單靠左對齊 */
+            margin-top: 10px; /* 調整表單元素之間的間距 */
+            padding: 0 0px; /* 調整表單的內邊距 */
+        }
+
+        label {
+            font-size: 20px; /* 设置label元素的字体大小为20像素 */
+            display: flex; /* 将label元素设为flex布局 */
+            align-items: center; /* 垂直居中对齐 */
+        }
+
+        input, select {
+            font-size: 20px; /* 设置输入框和下拉式選單的字体大小为20像素 */
+            padding: 8px; /* 设置输入框和下拉式選單的内边距 */
+            margin-left: 0; /* 調整左邊距為0 */
+            width: 240px; /* 調整輸入框和下拉式選單的寬度 */
+        }
+
+        button {
+            width: 200px;
+            height: 80px;
+            font-size: 22px;
+            background-color: #808080;
+            color: white;
+            border: none;
+            transition: background-color 0.3s;
+            margin-left: 0; /* 調整左邊距為0 */
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+    </style>
+
+    <script src="./patient.js"></script>
+    <script src="./DrugAllergy.js"></script>
+    <script src="./download.js"></script>
+	<script src="./config.js"></script>
+    <title>雲端藥歷</title>
+</head>
+<body>
+    
+    <nav>
+        <button onclick="window.location.href = 'showPatientInfo.html'">病患資料建檔</button>
+        <button onclick="window.location.href = 'diagnosis_info.html'">上傳病歷檔案</button>
+        <button onclick="window.location.href = 'showDownload.html'">下載病歷報告</button>
+        <!--<button onclick="window.location.href = 'medicine.html'">藥物相關注意事項警示</button>-->
+        <button onclick="window.location.href = 'MedicineRecommandation.html'">藥物推薦</button>
+	<!--<button onclick="window.location.href = 'Nutritional management.html'">營養管理</button>-->
+        <button onclick="window.location.href = 'showAllPatients.html'">查看病患資料</button>
+    </nav>
+
+    <main id="content">
+        <!-- 內容將根據點擊的按鈕而變化 -->
+        <h1 style="text-align: center; margin-bottom: 0.1em;">
+  		電子病歷資訊網站
+	</h1>
+	<h2 style="text-align: center; margin-top: 0.1em;">
+  		(資料來源: 衛福部健保雲端資料 醫院自有病歷資料 個人攜帶的病歷資料)
+	</h2>
+    </main>
+
+    <script>
+        let patientId;
+
+        // 獲取 URL 中的查詢參數 id
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
+
+        function showAllergyIntolerance(patientId) {
+            // 構建包含病患 ID 的 FormData
+            const data = new FormData();
+            data.append('userURL', `/MedicationDispense?patient=${patientId}`);
+
+            const url = `${API_BASE_URL}/view`; // Flask 伺服器的端點 URL
+
+            fetch(url, {
+                method: 'POST',
+                body: data
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(data => {
+                console.log('Received JSON data:', data);
+
+                const jsonData = JSON.parse(data);
+                console.log('Parsed JSON data:', jsonData);
+				let html = '<h1 style="text-align: center; margin-bottom: 0.1em;">電子病歷資訊網站</h1>';
+				html += '<h2 style="text-align: center; margin-top: 0.1em;">(資料來源: 衛福部健保雲端資料 醫院自有病歷資料 個人攜帶的病歷資料)</h2>';
+                html += '<h2 style="margin: 0 0 0.0em 0; padding: 0;">雲端藥歷</h2>';
+                //html += '<label for="MedicationDispense">新增藥歷</label>';
+                //html += '<input type="text" id="MedicationDispense" placeholder="新增藥歷"> ';
+                //html += '<button type="button" onclick="uploadFiles()">上傳</button>';
+                html += '<br><br>';
+                html += '<div id="loadingSpinner" style="display: none; text-align: center;">';
+                html += '<img src="Loading_icon.gif" alt="Loading..." width="50" height="50">';
+                html += '<p>Loading...</p>';
+                html += '</div>';
+                html += '<div id="responseMessage"></div>';
+
+                // New table for medication information
+                html += '<table>';
+				html += '<table border="1" style="margin-top: 0.0em;">';
+                //html += '<tr><th>藥品名稱</th><th>藥品成分</th><th>劑量</th><th>天數</th><th>日期</th><th>刪除</th></tr>';
+				html += '<tr><th>藥品名稱</th><th>藥品成分</th><th>劑量</th><th>天數</th><th>日期</th></tr>';
+                if (jsonData.resourceType === 'Bundle' && Array.isArray(jsonData.entry)) {
+				
+					 jsonData.entry.sort((a, b) => {
+                        const dateA = new Date(a.resource.whenHandedOver || '');
+                        const dateB = new Date(b.resource.whenHandedOver || '');
+                        if (dateA.getTime() !== dateB.getTime()) {
+                            return dateB - dateA; // Sort by date descending
+                        }
+                        // If dates are the same, sort by medication name
+                        const nameA = a.resource.medicationCodeableConcept.text || '';
+                        const nameB = b.resource.medicationCodeableConcept.text || '';
+                        return nameA.localeCompare(nameB); // Sort alphabetically
+                    });
+					
+                    jsonData.entry.forEach(entry => {
+                        if (entry.resource.resourceType === 'MedicationDispense') {
+                            const medicationName = entry.resource.medicationCodeableConcept.text || '';
+                            const medicationComponent = entry.resource.note ? entry.resource.note[0].text : '';
+                            const quantity = entry.resource.quantity.value.toString();
+                            const days = entry.resource.daysSupply && entry.resource.daysSupply.value ? entry.resource.daysSupply.value.toString() : 'N.A.';
+                            const date = entry.resource.whenHandedOver || '';
+                            const medicationId = entry.resource.id;
+
+                            html += `<tr>
+                                        <td>${medicationName}</td>
+                                        <td>${medicationComponent}</td>
+                                        <td>${quantity}</td>
+                                        <td>${days}</td>
+                                        <td>${date}</td>
+                                    </tr>`;
+                        }
+                    });
+                }
+
+                html += '</table>';
+
+                
+                html += '<br><br>';
+                
+                html += '<button onclick="location.href=\'showAllPatients.html\'">上一頁</button>';
+                document.getElementById("content").innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+        }
+
+        // 在頁面加載時顯示觀察結果
+        window.onload = function() {
+            patientId = id;
+            showAllergyIntolerance(id);
+        };
+    </script>
+</body>
+</html>

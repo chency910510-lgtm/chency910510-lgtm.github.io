@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            display: flex;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            font-size: 22px;
+            background-color: #d3d3d3; /* 整個網頁背景為淺灰色 */
+        }
+
+        h1 {
+            margin-top: 0px; /* 調整標題與上方的距離 */
+            font-size: 40px; /* 調整標題字體大小 */
+            color: #000000;
+            background-color: #d3d3d3; /* 調整標題背景色為淺灰色 */
+            padding: 0px; /* 添加標題的內邊距 */
+            text-align: center; /* 標題置中 */
+        }
+
+        nav {
+            background-color: #333;
+            color: white;
+            padding: 15px;
+            width: 240px;
+            height: 200vh; /* Set a fixed height using viewport height (100vh) */
+        }
+
+        nav button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 20px;
+            color: white;
+            background-color: #555;
+            border: none;
+            cursor: pointer;
+        }
+
+        nav button:hover {
+            background-color: #333;
+        }
+
+        main {
+            flex: 1;
+            padding: 20px;
+        }
+
+        form {
+            text-align: left; /* 輸入框和下拉式選單靠左對齊 */
+            margin-top: 10px; /* 調整表單元素之間的間距 */
+            padding: 0 0px; /* 調整表單的內邊距 */
+        }
+
+        label {
+            font-size: 20px; /* 设置label元素的字体大小为20像素 */
+            display: flex; /* 将label元素设为flex布局 */
+            align-items: center; /* 垂直居中对齐 */
+        }
+
+        input, select {
+            font-size: 20px; /* 设置输入框和下拉式選單的字体大小为20像素 */
+            padding: 8px; /* 设置输入框和下拉式選單的内边距 */
+            margin-left: 0; /* 調整左邊距為0 */
+            width: 240px; /* 調整輸入框和下拉式選單的寬度 */
+        }
+		.input-container {
+            margin-bottom: 20px; /* 增加輸入框和按鈕之間的距離 */
+        }
+
+        button {
+            width: 100px;
+            height: 80px;
+            font-size: 22px;
+            background-color: #808080;
+            color: white;
+            border: none;
+            transition: background-color 0.3s;
+            margin-left: 0; /* 調整左邊距為0 */
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+    </style>
+
+    <script src="./patient.js"></script>
+    <script src="./DrugAllergy.js"></script>
+    <script src="./download.js"></script>
+	<script src="./config.js"></script>
+    <title>抽菸史</title>
+</head>
+<body>
+    
+    <nav>
+        <button onclick="window.location.href = 'showPatientInfo.html'">病患資料建檔</button>
+        <button onclick="window.location.href = 'diagnosis_info.html'">上傳病歷檔案</button>
+        <button onclick="window.location.href = 'showDownload.html'">下載病歷報告</button>
+		<button onclick="window.location.href = 'medicine.html'">藥物相關注意事項警示</button>
+	    <button onclick="window.location.href = 'MedicineRecommandation.html'">藥物推薦</button>
+	    <button onclick="window.location.href = 'Nutritional management.html'">營養管理</button>
+		<button onclick="window.location.href = 'showAllPatients.html'">查看病患資料</button>
+    </nav>
+
+    <main id="content">
+        <!-- 內容將根據點擊的按鈕而變化 -->
+        <h1>抽菸史</h1>
+    </main>
+
+    <script>
+        let patientId;
+
+        // 獲取 URL 中的查詢參數 id
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
+
+        function showAllergyIntolerance(patientId) {
+            // 構建包含病患 ID 的 FormData
+            const data = new FormData();
+            data.append('userURL', `/AllergyIntolerance?patient=${patientId}`);
+
+            const url = `${API_BASE_URL}/view`; // Flask 伺服器的端點 URL
+
+            fetch(url, {
+                method: 'POST',
+                body: data
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(data => {
+                console.log('Received JSON data:', data); // 打印收到的 JSON 数据
+
+                const jsonData = JSON.parse(data); // 解析JSON数据
+                console.log('Parsed JSON data:', jsonData); // 打印解析后的 JSON 数据
+
+                let html = '<h1 style="text-align: center;">藥物過敏史</h1>';
+                html += '<label for="AllergyIntolerance">新增藥物過敏史</label>';
+                html += '<input type="text" id="AllergyIntolerance" placeholder="新增藥物過敏史"> ';
+                html += '<button type="button" onclick="uploadFiles()">上傳</button>';
+                html += '<br><br>';
+                html += '<br><br>';
+                html += '<div id="loadingSpinner" style="display: none; text-align: center;">';
+                html += '<img src="Loading_icon.gif" alt="Loading..." width="50" height="50">';
+                html += '<p>Loading...</p>';
+                html += '</div>';
+                html += '<div id="responseMessage"></div>';
+
+                html += '<table border="1">';
+                html += '<tr><th>藥物過敏史</th><th>刪除</th></tr>';
+
+                // 检查 resourceType 属性是否为 Bundle，并且包含 entry 数组
+                if (jsonData.resourceType === 'Bundle' && Array.isArray(jsonData.entry)) {
+				// 遍历每个 entry
+				jsonData.entry.forEach(entry => {
+					if (entry.resource.resourceType === 'AllergyIntolerance') {
+						// 提取 code 中的 text 字段内容
+						let codeText = entry.resource.code.text || '';
+						let medicationId = entry.resource.id;
+						// 将表格行添加到 HTML 字符串中
+						html += `<tr>
+									<td>${codeText}</td>
+									<td><button onclick="deleteEntry('${medicationId}')">刪除</button></td>
+								</tr>`;
+                        } else {
+                            console.error('Error: Entry resource type is invalid.');
+                        }
+                    });
+                } else {
+                    console.error('Error: Data structure is invalid.');
+                }
+
+                html += '</table>';
+
+                // 添加距离
+                html += '<br><br>';
+                // 添加上一页按钮
+                html += '<button onclick="location.href=\'showAllPatients.html\'">上一頁</button>';
+                document.getElementById("content").innerHTML = html;
+
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+        }
+
+        // 在頁面加載時顯示觀察結果
+        window.onload = function() {
+            patientId = id;
+            showAllergyIntolerance(id);
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            display: flex;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            font-size: 22px;
+            background-color: #d3d3d3; /* 整個網頁背景為淺灰色 */
+        }
+
+        h1 {
+            margin-top: 0px; /* 調整標題與上方的距離 */
+            font-size: 40px; /* 調整標題字體大小 */
+            color: #000000;
+            background-color: #d3d3d3; /* 調整標題背景色為淺灰色 */
+            padding: 0px; /* 添加標題的內邊距 */
+            text-align: center; /* 標題置中 */
+        }
+
+        nav {
+            background-color: #333;
+            color: white;
+            padding: 15px;
+            width: 240px;
+            height: 200vh; /* Set a fixed height using viewport height (100vh) */
+        }
+
+        nav button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 20px;
+            color: white;
+            background-color: #555;
+            border: none;
+            cursor: pointer;
+        }
+
+        nav button:hover {
+            background-color: #333;
+        }
+
+        main {
+            flex: 1;
+            padding: 20px;
+        }
+
+        form {
+            text-align: left; /* 輸入框和下拉式選單靠左對齊 */
+            margin-top: 10px; /* 調整表單元素之間的間距 */
+            padding: 0 0px; /* 調整表單的內邊距 */
+        }
+
+        label {
+            font-size: 20px; /* 设置label元素的字体大小为20像素 */
+            display: flex; /* 将label元素设为flex布局 */
+            align-items: center; /* 垂直居中对齐 */
+        }
+
+        input, select {
+            font-size: 20px; /* 设置输入框和下拉式選單的字体大小为20像素 */
+            padding: 8px; /* 设置输入框和下拉式選單的内边距 */
+            margin-left: 0; /* 調整左邊距為0 */
+            width: 240px; /* 調整輸入框和下拉式選單的寬度 */
+        }
+		.input-container {
+            margin-bottom: 20px; /* 增加輸入框和按鈕之間的距離 */
+        }
+
+        button {
+            width: 100px;
+            height: 80px;
+            font-size: 22px;
+            background-color: #808080;
+            color: white;
+            border: none;
+            transition: background-color 0.3s;
+            margin-left: 0; /* 調整左邊距為0 */
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+    </style>
+
+    <script src="./patient.js"></script>
+    <script src="./FMH.js"></script>
+    <script src="./download.js"></script>
+	<script src="./config.js"></script>
+    <title>檢測數據</title>
+</head>
+<body>
+    
+    <nav>
+        <button onclick="window.location.href = 'showPatientInfo.html'">病患資料建檔</button>
+        <button onclick="window.location.href = 'diagnosis_info.html'">上傳病歷檔案</button>
+        <button onclick="window.location.href = 'showDownload.html'">下載病歷報告</button>
+		<!--<button onclick="window.location.href = 'medicine.html'">藥物相關注意事項警示</button>-->
+	    <button onclick="window.location.href = 'MedicineRecommandation.html'">藥物推薦</button>
+	    <!--<button onclick="window.location.href = 'Nutritional management.html'">營養管理</button>-->
+		<button onclick="window.location.href = 'showAllPatients.html'">查看病患資料</button>
+    </nav>
+
+    <main id="content">
+        <!-- 內容將根據點擊的按鈕而變化 -->
+        <h1>檢測數據</h1>
+    </main>
+
+    <script>
+// 獲取 URL 中的查詢參數 id
+		
+         let patientId;  // 全局變量
+
+        // 獲取 URL 中的查詢參數 id
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
+
+        function Familyhistory(patientId) {
+            const data = new FormData();
+            data.append('userURL', `/FamilyMemberHistory?patient=${patientId}`);
+
+            const url = `${API_BASE_URL}/view`; // Flask 服务器的端点 URL
+
+            fetch(url, {
+                method: 'POST',
+                body: data
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(data => {
+                const jsonData = JSON.parse(data); 
+
+                let html = '<h1 style="text-align: center;">家族病史</h1>';
+                
+                // 添加輸入框和按鈕
+                html += '<label for="familyhistory">新增家族病史</label>';
+                html += '<input type="text" id="familyhistory">';
+                html += '<button type="button" style="margin-left: 20px;" onclick="uploadFiles()">上傳</button>';
+                html += '<br><br>';
+                html += '<br><br>';
+                html += '<div id="loadingSpinner" style="display: none; text-align: center;">';
+                html += '<img src="Loading_icon.gif" alt="Loading..." width="50" height="50">';
+                html += '<p>Loading...</p>';
+                html += '</div>';
+                html += '<div id="responseMessage"></div>';
+
+                // 添加家族病史表格
+                html += '<table border="1">';
+                html += '<tr><th>家族病史</th><th>刪除</th></tr>';
+
+                if (jsonData.hasOwnProperty('entry') && Array.isArray(jsonData.entry)) {
+                    jsonData.entry.forEach(entry => {
+                        let conditionText = ''; 
+                        let entryId = entry.resource.id; // 獲取條目的ID
+
+                        if (entry.resource.hasOwnProperty('condition') && Array.isArray(entry.resource.condition)) {
+                            entry.resource.condition.forEach(condition => {
+                                if (condition.code && condition.code.text) {
+                                    conditionText = condition.code.text;
+                                }
+                            });
+                        }
+
+                        // 将表格行添加到HTML字符串中
+                        html += `<tr>
+                                    <td>${conditionText}</td>
+                                    <td><button onclick="deleteEntry('${entryId}')">刪除</button></td>
+                                 </tr>`;
+                    });
+                } else {
+                    console.error('Error: Data structure is invalid.'); 
+                }
+
+                html += '</table>';
+
+                // 添加距離
+                html += '<br><br>';
+                // 添加上一頁按鈕
+                html += '<button onclick="location.href=\'showAllPatients.html\'">上一頁</button>';
+                document.getElementById("content").innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+        }
+
+        // 在頁面加載時顯示觀察結果
+        window.onload = function() {
+            patientId = id;  // 保存 id 到全局變量
+            Familyhistory(id);
+        };
+		
+    </script>
+</body>
+</html>

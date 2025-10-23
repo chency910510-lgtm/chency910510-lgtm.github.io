@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            display: flex;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            font-size: 22px;
+            background-color: #d3d3d3; /* 整個網頁背景為淺灰色 */
+        }
+
+        h1 {
+            margin-top: 0px; /* 調整標題與上方的距離 */
+            font-size: 40px; /* 調整標題字體大小 */
+            color: #000000;
+            background-color: #d3d3d3; /* 調整標題背景色為淺灰色 */
+            padding: 0px; /* 添加標題的內邊距 */
+            text-align: center; /* 標題置中 */
+        }
+
+        nav {
+            background-color: #333;
+            color: white;
+            padding: 15px;
+            width: 240px;
+            height: 100vh; /* Set a fixed height using viewport height (100vh) */
+        }
+
+        nav button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 20px;
+            color: white;
+            background-color: #555;
+            border: none;
+            cursor: pointer;
+        }
+
+        nav button:hover {
+            background-color: #333;
+        }
+
+        main {
+            flex: 1;
+            padding: 20px;
+        }
+
+        form {
+            text-align: left; /* 輸入框和下拉式選單靠左對齊 */
+            margin-top: 10px; /* 調整表單元素之間的間距 */
+            padding: 0 0px; /* 調整表單的內邊距 */
+        }
+
+        label {
+            font-size: 20px; /* 设置label元素的字体大小为20像素 */
+            display: flex; /* 将label元素设为flex布局 */
+            align-items: center; /* 垂直居中对齐 */
+        }
+
+        input, select {
+            font-size: 20px; /* 设置输入框和下拉式選單的字体大小为20像素 */
+            padding: 8px; /* 设置输入框和下拉式選單的内边距 */
+            margin-left: 0; /* 調整左邊距為0 */
+            width: 240px; /* 調整輸入框和下拉式選單的寬度 */
+        }
+
+        button {
+            width: 200px;
+            height: 80px;
+            font-size: 22px;
+            background-color: #808080;
+            color: white;
+            border: none;
+            transition: background-color 0.3s;
+            margin-left: 0; /* 調整左邊距為0 */
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+    </style>
+
+    <script src="./patient.js"></script>
+    <script src="./observation.js"></script>
+    <script src="./download.js"></script>
+    <title>檢測數據</title>
+</head>
+<body>
+    
+    <nav>
+	<button onclick="window.location.href = 'showPatientInfo.html'">病患資料建檔</button>
+        <button onclick="window.location.href = 'diagnosis_info.html'">上傳病歷檔案</button>
+        <button onclick="window.location.href = 'showDownload.html'">下載病歷報告</button>
+	<!--<button onclick="window.location.href = 'medicine.html'">藥物相關注意事項警示</button>-->
+	<button onclick="window.location.href = 'MedicineRecommandation.html'">藥物推薦</button>
+	<!--<button onclick="window.location.href = 'Nutritional management.html'">營養管理</button>-->
+	<button onclick="window.location.href = 'showAllPatients.html'">查看病患資料</button>
+    </nav>
+
+    <main id="content">
+        <!-- 內容將根據點擊的按鈕而變化 -->
+        <h1>檢測數據</h1>
+    </main>
+
+    <script>
+        // 獲取 URL 中的查詢參數 id
+
+         function showDownload() {
+            document.getElementById("content").innerHTML = `
+                <h1 style="text-align: center; margin-bottom: 0.1em;">
+  		電子病歷資訊網站
+	</h1>
+	<h2 style="text-align: center; margin-top: 0.1em;">
+  		(資料來源: 衛福部健保雲端資料 醫院自有病歷資料 個人攜帶的病歷資料)
+	</h2>
+				<h2>下載病患病歷</h2>
+                <p id="errorOutput" style="color: red;"></p>
+                <form action="#" method="post" enctype="multipart/form-data">
+                    <label for="">姓名</label>
+                    <input type="text" id="name">
+                    <br><br>
+                    <label for="userID">身分證字號</label>
+                    <input type="text" id="userID">
+		    <!-- 
+                    <br><br>
+					<label for="userPrompt">醫師輸入prompt</label>
+                    <input type="text" id="userPrompt">
+		     -->
+                    <br><br>
+                    <button type="button" onclick="downloadData()">下載資料</button>
+					<br><br>
+					<div id="loadingSpinner" style="display: none; text-align: center;">
+					<img src="Loading_icon.gif" alt="Loading..." width="50" height="50">
+					<p>Loading...</p>
+				</div>
+					<div id="responseMessage"></div>
+                </form>`;
+        }
+
+        // 在頁面加載時顯示觀察結果
+        window.onload = function() {
+            showDownload();
+        };
+    </script>
+</body>
+</html>

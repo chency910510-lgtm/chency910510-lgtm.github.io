@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="style.css">
+    <script src="./download.js"></script>
+    <title>Hello World!</title>
+</head>
+<body>
+    <h1>病患資料</h1>
+	
+	<p id="errorOutput" style="color: red;"></p>
+	
+    <form action="#" method="post" enctype="multipart/form-data">
+        <label for="">姓名</label>
+        <input type="text" id="name">
+		
+		<br><br>
+		<label for="userID">身分證字號</label>
+        <input type="text" id="userID">
+		
+
+        <br><br>
+        <button type="button" onclick="downloadData()">下載資料</button>
+    </form>    
+	
+</body>
+</html>
