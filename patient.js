@@ -1,5 +1,65 @@
+// 1. 新增 checkDuplicateID 函數 (實現即時 API 呼叫)
+function checkDuplicateID() {
+    const userIDInput = document.getElementById('userID');
+    const warningSpan = document.getElementById('duplicateWarning');
+    const nid = userIDInput.value.trim();
+
+    warningSpan.innerHTML = ''; 
+    
+    if (nid.length === 0) {
+        userIDInput.dataset.isDuplicate = 'false'; 
+        return; 
+    }
+
+    // --- 參考您的 API 模式來建立請求 ---
+    const api_url = `${API_BASE_URL}/check_patient_id`;
+    
+    const formData = new FormData();
+    // 後端路由 /check_patient_id 預期接收的欄位名稱為 'identifier'
+    formData.append('identifier', nid); 
+    // ------------------------------------
+    
+    // 這裡我們不顯示 loading spinner，因為 onblur 檢查通常要求快速無感
+
+    fetch(api_url, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.ok && data.exists) {
+            // 如果後端回傳 exists: true (已重複)
+            warningSpan.innerHTML = '已有病患建檔資料';
+            userIDInput.dataset.isDuplicate = 'true'; // 【關鍵標記】設置為重複
+        } else {
+            // 如果不存在
+            warningSpan.innerHTML = '';
+            userIDInput.dataset.isDuplicate = 'false'; // 移除重複標記
+        }
+    })
+    .catch(error => {
+        console.error('檢查身分證重複性時發生錯誤:', error);
+        warningSpan.innerHTML = '檢查失敗';
+        userIDInput.dataset.isDuplicate = 'false';
+    });
+}
+
+
 function uploadFhirData() {
     document.getElementById("responseMessage").innerHTML = '';
+    
+    //1024新增
+    const userIDInput = document.getElementById('userID');
+    const responseMessage = document.getElementById('responseMessage');
+
+    // 【步驟 1: 送出前的最終攔截檢查】
+    // 檢查是否有由 checkDuplicateID 函數設定的重複標記
+    if (userIDInput.dataset.isDuplicate === 'true') {
+        responseMessage.innerHTML = '<span style="color: red;">上傳失敗：身分證字號已有建檔資料，請檢查！</span>';
+        return; // 立即返回，阻止後續的建檔操作
+    }
+    //1024 fin
+    
     // 從表單字段中獲取數據
     var Uname = document.getElementById("name").value;
     var userID = document.getElementById("userID").value;
@@ -46,3 +106,4 @@ function uploadFhirData() {
         loadingSpinner.style.display = 'none';
     });
 }
+
