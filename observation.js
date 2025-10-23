@@ -38,13 +38,13 @@ function uploadFiles() {
 
     var userName = document.getElementById("name").value;
     var userID = document.getElementById("userID").value;
-    var userEmail = "kevin96587@gmail.com";
-    var pasthistory = '[' + Array.from(selectedPastConditions).map(item => `"${item}"`).join(',') + ']';
-    var familyhistory = '[' + Array.from(selectedConditions).map(item => `"${item}"`).join(',') + ']';
-    var family_history_heart = document.getElementById("family_history_heart").value;
-    var family_history_heart_input = document.getElementById("family_history_heart_input").value;
-    var smoking = document.querySelector('input[name="smoking"]:checked').value;
-    var drinking = document.querySelector('input[name="drinking"]:checked').value;
+    //var userEmail = "kevin96587@gmail.com";
+    //var pasthistory = '[' + Array.from(selectedPastConditions).map(item => `"${item}"`).join(',') + ']';
+    //var familyhistory = '[' + Array.from(selectedConditions).map(item => `"${item}"`).join(',') + ']';
+    //var family_history_heart = document.getElementById("family_history_heart").value;
+    //var family_history_heart_input = document.getElementById("family_history_heart_input").value;
+    //var smoking = document.querySelector('input[name="smoking"]:checked').value;
+    //var drinking = document.querySelector('input[name="drinking"]:checked').value;
 
     const fileInput = document.getElementById('fileInput');
     const picturefileInput = document.getElementById('picturefileInput'); // 注意这里的 ID
@@ -54,13 +54,13 @@ function uploadFiles() {
     const formData = new FormData();
     formData.append('userID', userID);
     formData.append('userName', userName);
-    formData.append('userEmail', userEmail);
-    formData.append('pasthistory', pasthistory);
-    formData.append('familyhistory', familyhistory);
-    formData.append('family_history_heart', family_history_heart);
-    formData.append('family_history_heart_input', family_history_heart_input);
-    formData.append('smoking', smoking);
-    formData.append('drinking', drinking);
+    //formData.append('userEmail', userEmail);
+    //formData.append('pasthistory', pasthistory);
+    //formData.append('familyhistory', familyhistory);
+    //formData.append('family_history_heart', family_history_heart);
+    //formData.append('family_history_heart_input', family_history_heart_input);
+    //formData.append('smoking', smoking);
+    //formData.append('drinking', drinking);
 
     const files = fileInput.files;
     if (files.length > 0) {
@@ -110,6 +110,7 @@ function uploadFiles() {
         loadingSpinner.style.display = 'none';
     });
 }
+
 
 
 
