@@ -54,7 +54,7 @@ function uploadFiles() {
     const formData = new FormData();
     formData.append('userID', userID);
     formData.append('userName', userName);
-    //formData.append('userEmail', userEmail);
+    formData.append('userEmail', userEmail);
     //formData.append('pasthistory', pasthistory);
     //formData.append('familyhistory', familyhistory);
     //formData.append('family_history_heart', family_history_heart);
@@ -110,6 +110,7 @@ function uploadFiles() {
         loadingSpinner.style.display = 'none';
     });
 }
+
 
 
 
