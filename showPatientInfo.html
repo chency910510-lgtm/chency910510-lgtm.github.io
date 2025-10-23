@@ -127,7 +127,7 @@
             <input type="text" id="name" placeholder="">
             <br><br>
             <label for="userID">身分證字號</label>
-            <input type="text" id="userID" placeholder="" onblur="checkDuplicateID()" >
+            <input type="text" id="userID" placeholder="" onkeyup="checkDuplicateID()" >
 			<span id="duplicateWarning" style="color: red; margin-left: 10px;"></span>
             <br><br>
             <label for="birthdate">生日</label>
@@ -159,5 +159,6 @@
     </script>
 </body>
 </html>
+
 
 
