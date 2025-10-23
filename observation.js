@@ -38,7 +38,7 @@ function uploadFiles() {
 
     var userName = document.getElementById("name").value;
     var userID = document.getElementById("userID").value;
-    //var userEmail = "kevin96587@gmail.com";
+    var userEmail = "kevin96587@gmail.com";
     //var pasthistory = '[' + Array.from(selectedPastConditions).map(item => `"${item}"`).join(',') + ']';
     //var familyhistory = '[' + Array.from(selectedConditions).map(item => `"${item}"`).join(',') + ']';
     //var family_history_heart = document.getElementById("family_history_heart").value;
@@ -110,6 +110,7 @@ function uploadFiles() {
         loadingSpinner.style.display = 'none';
     });
 }
+
 
 
 
