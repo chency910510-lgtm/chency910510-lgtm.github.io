@@ -55,7 +55,7 @@ function uploadFhirData() {
     // 【步驟 1: 送出前的最終攔截檢查】
     // 檢查是否有由 checkDuplicateID 函數設定的重複標記
     if (userIDInput.dataset.isDuplicate === 'true') {
-        responseMessage.innerHTML = '<span style="color: red;">上傳失敗：身分證字號已有建檔資料，請檢查！</span>';
+        responseMessage.innerHTML = '<span style="color: red;">建檔失敗：此身分證字號已有建檔資料，請檢查！</span>';
         return; // 立即返回，阻止後續的建檔操作
     }
     //1024 fin
@@ -106,4 +106,5 @@ function uploadFhirData() {
         loadingSpinner.style.display = 'none';
     });
 }
+
 
